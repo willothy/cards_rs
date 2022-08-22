@@ -2,7 +2,7 @@ use std::{slice::Iter, fmt::Display};
 use rand::Rng;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-enum Suit {
+pub enum Suit {
     Spades,
     Clubs,
     Hearts,
@@ -23,7 +23,7 @@ impl Suit {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-enum Value {
+pub enum Value {
     Ace,
     Two,
     Three,
@@ -62,9 +62,9 @@ impl Value {
 }
 
 #[derive(Debug, PartialEq)]
-struct Card {
-    suit: Suit,
-    value: Value
+pub struct Card {
+    pub suit: Suit,
+    pub value: Value
 }
 
 impl Card {
@@ -78,12 +78,12 @@ impl Card {
 
 impl Display for Card {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?} of {:?}\n", self.value, self.suit)
+        write!(f, "{:?} of {:?}", self.value, self.suit)
     }
 }
 
 #[derive(Debug, PartialEq)]
-struct Deck {
+pub struct Deck {
     cards: Vec<Card>
 }
 
@@ -102,6 +102,15 @@ impl Deck {
         }
     }
 
+    pub fn reset(&mut self) {
+        self.cards.clear();
+        for suit in Suit::iter() {
+            for value in Value::iter() {
+                self.cards.push(Card::new(*suit, *value));
+            }
+        }
+    }
+
     pub fn shuffle(&mut self) {
         /*
             // Fisher-Yates shuffle
@@ -114,6 +123,21 @@ impl Deck {
             let j = rand::thread_rng().gen_range(0..(self.cards.len()-1));
             self.cards.swap(j, i);
         }
+    }
+
+    pub fn draw(&mut self) -> Option<Card> {
+        self.cards.pop()
+    }
+
+    pub fn draw_multiple(&mut self, n: usize) -> Vec<Card> {
+        let mut cards: Vec<Card> = Vec::new();
+        for _ in 0..n {
+            match self.draw() {
+                Some(card) => cards.push(card),
+                None => return cards
+            }
+        }
+        cards
     }
 }
 
@@ -131,10 +155,223 @@ mod tests {
     use super::*;
 
     #[test]
-    fn display_deck() -> Result<(), String> {
+    fn create_deck() {
         let deck = Deck::new();
-        println!("{}", deck);
-        Ok(())
+        /* for card in &deck.cards {
+            println!("Card {{\n\tsuit: Suit::{:?},\n\tvalue: Value::{:?}\n}},", card.suit, card.value);
+        } */
+        assert_eq!(Deck {
+            cards: vec![
+                Card {
+                    suit: Suit::Spades,
+                    value: Value::Ace
+                },
+                Card {
+                    suit: Suit::Spades,
+                    value: Value::Two
+                },
+                Card {
+                    suit: Suit::Spades,
+                    value: Value::Three
+                },
+                Card {
+                    suit: Suit::Spades,
+                    value: Value::Four
+                },
+                Card {
+                    suit: Suit::Spades,
+                    value: Value::Five
+                },
+                Card {
+                    suit: Suit::Spades,
+                    value: Value::Six
+                },
+                Card {
+                    suit: Suit::Spades,
+                    value: Value::Seven
+                },
+                Card {
+                    suit: Suit::Spades,
+                    value: Value::Eight
+                },
+                Card {
+                    suit: Suit::Spades,
+                    value: Value::Nine
+                },
+                Card {
+                    suit: Suit::Spades,
+                    value: Value::Ten
+                },
+                Card {
+                    suit: Suit::Spades,
+                    value: Value::Jack
+                },
+                Card {
+                    suit: Suit::Spades,
+                    value: Value::Queen
+                },
+                Card {
+                    suit: Suit::Spades,
+                    value: Value::King
+                },
+                Card {
+                    suit: Suit::Clubs,
+                    value: Value::Ace
+                },
+                Card {
+                    suit: Suit::Clubs,
+                    value: Value::Two
+                },
+                Card {
+                    suit: Suit::Clubs,
+                    value: Value::Three
+                },
+                Card {
+                    suit: Suit::Clubs,
+                    value: Value::Four
+                },
+                Card {
+                    suit: Suit::Clubs,
+                    value: Value::Five
+                },
+                Card {
+                    suit: Suit::Clubs,
+                    value: Value::Six
+                },
+                Card {
+                    suit: Suit::Clubs,
+                    value: Value::Seven
+                },
+                Card {
+                    suit: Suit::Clubs,
+                    value: Value::Eight
+                },
+                Card {
+                    suit: Suit::Clubs,
+                    value: Value::Nine
+                },
+                Card {
+                    suit: Suit::Clubs,
+                    value: Value::Ten
+                },
+                Card {
+                    suit: Suit::Clubs,
+                    value: Value::Jack
+                },
+                Card {
+                    suit: Suit::Clubs,
+                    value: Value::Queen
+                },
+                Card {
+                    suit: Suit::Clubs,
+                    value: Value::King
+                },
+                Card {
+                    suit: Suit::Hearts,
+                    value: Value::Ace
+                },
+                Card {
+                    suit: Suit::Hearts,
+                    value: Value::Two
+                },
+                Card {
+                    suit: Suit::Hearts,
+                    value: Value::Three
+                },
+                Card {
+                    suit: Suit::Hearts,
+                    value: Value::Four
+                },
+                Card {
+                    suit: Suit::Hearts,
+                    value: Value::Five
+                },
+                Card {
+                    suit: Suit::Hearts,
+                    value: Value::Six
+                },
+                Card {
+                    suit: Suit::Hearts,
+                    value: Value::Seven
+                },
+                Card {
+                    suit: Suit::Hearts,
+                    value: Value::Eight
+                },
+                Card {
+                    suit: Suit::Hearts,
+                    value: Value::Nine
+                },
+                Card {
+                    suit: Suit::Hearts,
+                    value: Value::Ten
+                },
+                Card {
+                    suit: Suit::Hearts,
+                    value: Value::Jack
+                },
+                Card {
+                    suit: Suit::Hearts,
+                    value: Value::Queen
+                },
+                Card {
+                    suit: Suit::Hearts,
+                    value: Value::King
+                },
+                Card {
+                    suit: Suit::Diamonds,
+                    value: Value::Ace
+                },
+                Card {
+                    suit: Suit::Diamonds,
+                    value: Value::Two
+                },
+                Card {
+                    suit: Suit::Diamonds,
+                    value: Value::Three
+                },
+                Card {
+                    suit: Suit::Diamonds,
+                    value: Value::Four
+                },
+                Card {
+                    suit: Suit::Diamonds,
+                    value: Value::Five
+                },
+                Card {
+                    suit: Suit::Diamonds,
+                    value: Value::Six
+                },
+                Card {
+                    suit: Suit::Diamonds,
+                    value: Value::Seven
+                },
+                Card {
+                    suit: Suit::Diamonds,
+                    value: Value::Eight
+                },
+                Card {
+                    suit: Suit::Diamonds,
+                    value: Value::Nine
+                },
+                Card {
+                    suit: Suit::Diamonds,
+                    value: Value::Ten
+                },
+                Card {
+                    suit: Suit::Diamonds,
+                    value: Value::Jack
+                },
+                Card {
+                    suit: Suit::Diamonds,
+                    value: Value::Queen
+                },
+                Card {
+                    suit: Suit::Diamonds,
+                    value: Value::King
+                },
+            ]
+        }, deck);
     }
 
     #[test]
@@ -143,5 +380,14 @@ mod tests {
         let mut deck_to_shuffle = Deck::new();
         deck_to_shuffle.shuffle();
         assert_ne!(deck, deck_to_shuffle)
+    }
+
+    #[test]
+    fn draw_card() {
+        let mut deck = Deck::new();
+        let len = deck.cards.len();
+        let card = deck.draw().unwrap();
+        assert_eq!(deck.cards.len(), len-1);
+        assert!(!deck.cards.contains(&card));
     }
 }
